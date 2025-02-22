@@ -17,13 +17,10 @@ class ObjectDetectionApp:
             self.ui.window.quit()
             return
             
-        # Bind the closing event
         self.ui.window.protocol("WM_DELETE_WINDOW", self.on_closing)
         
-        # Bind the toggle detection callback
         self.ui.control_button.configure(command=self.toggle_detection)
-        
-        # Bind confidence threshold update
+
         self.ui.conf_slider.configure(command=self._update_confidence)
         
     def _update_confidence(self, value):
@@ -34,28 +31,27 @@ class ObjectDetectionApp:
     def toggle_detection(self):
         """Toggle the detection on/off"""
         try:
-            if not self.ui.running:  # If currently not running
+            if not self.ui.running:  
                 # Start detection
                 print("Starting camera...")
                 self.detector.start_camera()
-                self.ui.running = True  # Set running state before updating UI
+                self.ui.running = True  
                 self.ui.control_button.configure(
                     text="Stop Detection",
                     fg_color="#c42b1c",
                     hover_color="#a62215"
                 )
-                self.update_frame()  # Start the update loop
+                self.update_frame()  
             else:  # If currently running
                 # Stop detection
                 print("Stopping camera...")
                 self.detector.stop_camera()
-                self.ui.running = False  # Set running state before updating UI
+                self.ui.running = False 
                 self.ui.control_button.configure(
                     text="Start Detection",
                     fg_color=["#3a7ebf", "#1f538d"],
                     hover_color=["#325882", "#14375e"]
                 )
-                # Clear the video label
                 self.ui.video_label.configure(text="Camera Feed Not Started", image="")
                 
         except ValueError as e:
@@ -81,18 +77,17 @@ class ObjectDetectionApp:
         """Update the frame if detection is running"""
         if self.ui.running:
             try:
-                # Get frame and detections
+ 
                 frame, detections = self.detector.get_frame()
                 
                 if frame is not None:
-                    # Update UI
+
                     self.ui.update_frame(frame)
                     self.ui.update_detections(detections)
-                    
-                    # Schedule next update
+
                     self.ui.window.after(10, self.update_frame)
                 else:
-                    # Handle camera error
+    
                     print("Failed to get camera frame")
                     self.ui.running = False
                     self.ui.control_button.configure(
