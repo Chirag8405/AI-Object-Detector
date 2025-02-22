@@ -20,7 +20,7 @@ class ApplicationUI:
         self.main_frame = ctk.CTkFrame(self.window)
         self.main_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # Create left panel (video and controls)
+        # Create left panel 
         self.left_panel = ctk.CTkFrame(self.main_frame)
         self.left_panel.pack(side="left", fill="both", expand=True, padx=5, pady=5)
         
@@ -77,7 +77,7 @@ class ApplicationUI:
         )
         self.conf_value_label.pack(side="left", padx=5, pady=10)
         
-        # Create right panel (detections)
+        # Create right panel 
         self.right_panel = ctk.CTkFrame(self.main_frame, width=300)
         self.right_panel.pack(side="right", fill="y", padx=5, pady=5)
         self.right_panel.pack_propagate(False)
@@ -125,14 +125,14 @@ class ApplicationUI:
         if self.running:
             self.control_button.configure(
                 text="Stop Detection",
-                fg_color="#c42b1c",  # Red color for stop
+                fg_color="#c42b1c",  
                 hover_color="#a62215"
             )
-            self.video_label.configure(text="")  # Clear initial text
+            self.video_label.configure(text="")  
         else:
             self.control_button.configure(
                 text="Start Detection",
-                fg_color=["#3a7ebf", "#1f538d"],  # Default blue color
+                fg_color=["#3a7ebf", "#1f538d"], 
                 hover_color=["#325882", "#14375e"]
             )
             
@@ -140,11 +140,11 @@ class ApplicationUI:
         """Update the video frame with new image"""
         if ctk_image is not None:
             if not isinstance(ctk_image, ctk.CTkImage):
-                if isinstance(ctk_image, Image.Image):  # Check for PIL Image
+                if isinstance(ctk_image, Image.Image):  
                     ctk_image = ctk.CTkImage(light_image=ctk_image, size=(640, 480))
                 else:
-                    print(f"Invalid image type: {type(ctk_image)}")  # Debug print
-                    return  # Exit if not a valid image
+                    print(f"Invalid image type: {type(ctk_image)}")  
+                    return 
 
             self.current_image = ctk_image
             self.video_label.configure(image=self.current_image, text="")
@@ -154,16 +154,13 @@ class ApplicationUI:
             
     def update_detections(self, detections):
         """Update the detections list in the sidebar"""
-        # Update total detections
         self.total_detections_label.configure(text=f"Total Detections: {len(detections)}")
         
-        # Clear previous detections
         for widget in self.detections_frame.winfo_children():
             widget.destroy()
             
         # Add new detections
         for i, det in enumerate(detections):
-            # Create frame for each detection
             det_frame = ctk.CTkFrame(self.detections_frame)
             det_frame.pack(fill="x", pady=2, padx=5)
             
