@@ -36,10 +36,8 @@ class ObjectDetector:
         
     def download_models(self):
         """Download the required model files"""
-        # Create models directory if it doesn't exist
         os.makedirs('models', exist_ok=True)
         
-        # Create SSL context that doesn't verify certificates
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -98,14 +96,13 @@ class ObjectDetector:
         """Start the webcam capture with error handling"""
         try:
             print("Initializing camera...")
-            # Release any existing capture
             if self.cap is not None:
                 self.cap.release()
                 self.cap = None
             
             # Initialize camera
             self.cap = cv2.VideoCapture(0)
-            time.sleep(2)  # Allow time for camera to initialize
+            time.sleep(2) 
             
             if not self.cap.isOpened():
                 raise ValueError("Could not open webcam")
@@ -141,19 +138,15 @@ class ObjectDetector:
             return None, []
             
         try:
-            # Capture frame
             ret, frame = self.cap.read()
             if not ret or frame is None:
                 print("Failed to capture frame")
                 return None, []
             
-            # Flip frame horizontally for more natural interaction
             frame = cv2.flip(frame, 1)
             
-            # Get frame dimensions
             (H, W) = frame.shape[:2]
             
-            # Create a blob from the frame
             blob = cv2.dnn.blobFromImage(
                 frame,
                 1/255.0,
@@ -183,30 +176,24 @@ class ObjectDetector:
                     confidence = scores[class_id]
                     
                     if confidence > self.conf_threshold:
-                        # Scale bounding box coordinates back relative to image size
                         box = detection[0:4] * np.array([W, H, W, H])
                         (centerX, centerY, width, height) = box.astype("int")
                         
-                        # Get top-left corner coordinates
                         x = int(centerX - (width / 2))
                         y = int(centerY - (height / 2))
                         
-                        # Add detection to lists
                         boxes.append([x, y, int(width), int(height)])
                         confidences.append(float(confidence))
                         class_ids.append(class_id)
             
-            # Apply non-maxima suppression
             indices = cv2.dnn.NMSBoxes(boxes, confidences, self.conf_threshold, 0.3)
             
             results = []
             if len(indices) > 0:
                 for i in indices.flatten():
-                    # Get box coordinates
                     (x, y) = (boxes[i][0], boxes[i][1])
                     (w, h) = (boxes[i][2], boxes[i][3])
                     
-                    # Draw bounding box and label
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                     text = f"{self.classes[class_ids[i]]}: {confidences[i]:.2f}"
                     cv2.putText(frame, text, (x, y - 5),
